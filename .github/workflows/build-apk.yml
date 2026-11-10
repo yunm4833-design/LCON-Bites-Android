@@ -30,6 +30,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Bundle offline OSM road data
+        run: python3 scripts/fetch_osm.py
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
       - name: Upload APK
