@@ -3,7 +3,6 @@ package uk.co.lconbites
 import android.os.Bundle
 import android.content.Intent
 import android.net.Uri
-import coil.compose.AsyncImage
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -95,9 +94,8 @@ class MainActivity : ComponentActivity() {
                             Text(place.category.uppercase(), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             Text(place.description)
                             Text(place.address, color = Color.DarkGray)
-                            Text("Google rating: open Google Maps to view current reviews", color = Purple)
-                            TextButton(onClick = { val q = Uri.encode(place.name + " Leeds"); startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=$q"))) }) { Text("View Google rating and photos") }
-                            if (place.imageUrl.isNotBlank()) AsyncImage(model = place.imageUrl, contentDescription = "Photo from OpenStreetMap source", modifier = Modifier.fillMaxWidth().height(160.dp))
+                            Text("Ratings and photos are available in Google Maps (internet required)", color = Purple)
+                            TextButton(onClick = { val q = Uri.encode(place.name + ", " + (if (place.address == "Leeds city centre") "Leeds, UK" else place.address + ", Leeds, UK")); startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=$q"))) }) { Text("Open Google Maps · Ratings & photos") }
                             Text("Coordinates: ${place.latitude}, ${place.longitude}", fontSize = 11.sp, color = Color.Gray)
                         } },
                         confirmButton = { TextButton(onClick = { selected = null }) { Text("Close") } }
@@ -121,8 +119,7 @@ class MainActivity : ComponentActivity() {
 @Composable private fun PlaceCard(place: Restaurant, saved: Boolean, onOpen: () -> Unit, onSave: () -> Unit) {
     Row(Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(16.dp)).clickable { onOpen() }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(58.dp).background(Color(0xFFF0E5F4), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-            if (place.imageUrl.isNotBlank()) AsyncImage(model = place.imageUrl, contentDescription = "Restaurant photo", modifier = Modifier.fillMaxSize())
-            else Text(place.category.take(1).uppercase(), color = Purple, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(place.category.take(1).uppercase(), color = Purple, fontWeight = FontWeight.Bold, fontSize = 18.sp)
         }
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
             Text(place.name, color = Ink, fontWeight = FontWeight.Bold, fontSize = 15.sp)
