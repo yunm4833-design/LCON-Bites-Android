@@ -52,7 +52,7 @@ for e in raw["elements"]:
     if key in seen:continue
     seen.add(key)
     address=" ".join(x for x in [t.get("addr:housenumber",""),t.get("addr:street",""),t.get("addr:postcode","")] if x).strip()
-    places.append({"id":str(e["type"])+str(e["id"]),"name":t["name"],"category":t.get("cuisine") or t.get("amenity") or t.get("shop") or "Food","address":address or "Leeds city centre","lat":round(lat,6),"lon":round(lon,6),"distance_m":round(d),"osm_id":str(e["type"])+"/"+str(e["id"])})
+    places.append({"id":str(e["type"])+str(e["id"]),"name":t["name"],"category":t.get("cuisine") or t.get("amenity") or t.get("shop") or "Food","address":address or "Leeds city centre","lat":round(lat,6),"lon":round(lon,6),"distance_m":round(d),"osm_id":str(e["type"])+"/"+str(e["id"]),"image":t.get("image","") if t.get("image","").startswith("https://") else "","wikimedia_commons":t.get("wikimedia_commons","")})
 if len(roads)<100 or len(places)<35:
     raise SystemExit(f"FAILED: incomplete data: {len(roads)} roads, {len(places)} food POIs. No APK will be published.")
 places.sort(key=lambda x:(x["distance_m"],x["name"]))
