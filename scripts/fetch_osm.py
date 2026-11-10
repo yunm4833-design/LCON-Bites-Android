@@ -4,11 +4,11 @@ No public tile scraping. Fail the build rather than shipping an empty map.
 OSM contributors, ODbL 1.0: https://www.openstreetmap.org/copyright
 """
 import json, os, time, urllib.request, urllib.parse, math
-BBOX=(53.770,-1.584,53.827,-1.487)
+BBOX=(53.784,-1.559,53.813,-1.512)
 CENTER=(53.7986,-1.5354)
 OUT="app/src/main/assets"
 os.makedirs(OUT,exist_ok=True)
-query='''[out:json][timeout:100];(way["highway"](53.770,-1.584,53.827,-1.487);nwr["amenity"~"^(restaurant|cafe|fast_food|food_court|ice_cream)$"](53.770,-1.584,53.827,-1.487);nwr["shop"~"^(bakery|deli|pastry|confectionery)$"](53.770,-1.584,53.827,-1.487););out center geom;'''
+query='''[out:json][timeout:100];(way["highway"](53.784,-1.559,53.813,-1.512);nwr["amenity"~"^(restaurant|cafe|fast_food|food_court|ice_cream)$"](53.784,-1.559,53.813,-1.512);nwr["shop"~"^(bakery|deli|pastry|confectionery)$"](53.784,-1.559,53.813,-1.512););out center geom;'''
 hosts=[
 "https://overpass.kumi.systems/api/interpreter",
 "https://overpass.nchc.org.tw/api/interpreter",
@@ -45,9 +45,9 @@ for e in raw["elements"]:
     lat,lon=p.get("lat"),p.get("lon")
     if lat is None or lon is None:continue
     d=distance(lat,lon)
-    # Conservative 900 m straight-line candidate area. Actual walking network
+    # 1500 m straight-line candidate area. Actual walking network
     # may be longer; do NOT describe these as verified 15-minute walking routes.
-    if d>3000:continue
+    if d>1500:continue
     key=(t["name"].casefold().strip(),round(lat,4),round(lon,4))
     if key in seen:continue
     seen.add(key)
@@ -57,5 +57,5 @@ if len(roads)<100 or len(places)<35:
     raise SystemExit(f"FAILED: incomplete data: {len(roads)} roads, {len(places)} food POIs. No APK will be published.")
 places.sort(key=lambda x:(x["distance_m"],x["name"]))
 with open(OUT+"/leeds_roads.json","w") as f:json.dump({"roads":roads,"source":"© OpenStreetMap contributors; ODbL 1.0"},f,separators=(",",":"))
-with open(OUT+"/leeds_food.json","w") as f:json.dump({"places":places,"source":"© OpenStreetMap contributors; ODbL 1.0","scope":"3000m straight-line candidate radius, NOT verified 15-minute walking routes"},f,separators=(",",":"))
+with open(OUT+"/leeds_food.json","w") as f:json.dump({"places":places,"source":"© OpenStreetMap contributors; ODbL 1.0","scope":"1500m straight-line candidate radius, NOT verified 15-minute walking routes"},f,separators=(",",":"))
 print("VALIDATED OFFLINE SNAPSHOT:",len(roads),"roads,",len(places),"food places",flush=True)
