@@ -120,7 +120,7 @@ class MainActivity : ComponentActivity() {
                             Text(place.category.uppercase(), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             FoodIllustration(place, 108)
                             Text(tr("Illustration · not a restaurant photo","菜系示意插画 · 非餐厅实拍"), fontSize = 10.sp, color = Color.Gray)
-                            Text(if (chinese) "来自 OpenStreetMap 的餐厅资料，距离利兹音乐学院约 ${"{"}placeDistance(place)} 米（直线距离）。营业时间请以商家公布为准。" else place.description)
+                            Text(if (chinese) "来自 OpenStreetMap 的餐厅资料，距离利兹音乐学院约 ${placeDistance(place)} 米（直线距离）。营业时间请以商家公布为准。" else place.description)
                             Text(tr("Meles’ quick guide", "Meles 简短点评"), color = Purple, fontWeight = FontWeight.Bold)
                             Text(venueSummary(place, chinese))
                             Text(tr("Guide text is editorial, not a verified customer review.", "此为编辑性介绍，不是经过核实的顾客评价。"), fontSize = 10.sp, color = Color.Gray)
@@ -128,7 +128,7 @@ class MainActivity : ComponentActivity() {
                             Text(place.address, color = Color.DarkGray)
                             Text(tr("Google Maps ratings and photos require internet","Google Maps 评分和照片需要联网"), color = Purple)
                             TextButton(onClick = { val q = Uri.encode(place.name + ", " + (if (place.address == "Leeds city centre") "Leeds, UK" else place.address + ", Leeds, UK")); startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=$q"))) }) { Text(tr("Google Maps · Ratings & photos","谷歌地图 · 评分与照片")) }
-                            Text("${"{"}tr("Coordinates", "坐标")}: ${"{"}place.latitude}, ${"{"}place.longitude}", fontSize = 11.sp, color = Color.Gray)
+                            Text("${tr("Coordinates", "坐标")}: ${place.latitude}, ${place.longitude}", fontSize = 11.sp, color = Color.Gray)
                         } },
                         confirmButton = { TextButton(onClick = { selected = null }) { Text(tr("Close","关闭")) } }
                     )
