@@ -45,8 +45,8 @@ fun OfflineMap(onSelect: (Restaurant) -> Unit) {
     // into a decorative grid. Map is centered on Leeds Conservatoire.
     val centerLat = 53.7986
     val centerLon = -1.5354
-    val spanLat = 0.022
-    val spanLon = 0.038
+    val spanLat = 0.060
+    val spanLon = 0.108
     fun position(lat: Double, lon: Double, width: Float, height: Float): Offset {
         val x = ((lon - centerLon) / spanLon + 0.5).toFloat() * width
         val y = (0.5 - (lat - centerLat) / spanLat).toFloat() * height
