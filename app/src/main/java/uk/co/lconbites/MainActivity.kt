@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                         Header()
                         if (tab == 0) {
                             OfflineMap(onSelect = { selected = it })
-                            Text("LIA’S NEARBY PICKS · WITHIN 1.5 KM", modifier = Modifier.padding(start = 18.dp, top = 14.dp), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+                            Text("MELES’ NEARBY PICKS · WITHIN 1.5 KM", modifier = Modifier.padding(start = 18.dp, top = 14.dp), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                             LazyColumn(contentPadding = PaddingValues(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 items(Places.all.take(5)) { place -> PlaceCard(place, favourites.contains(place.id.toString()), { selected = place }, {
                                     favourites = favourites.toMutableSet().apply { if (contains(place.id.toString())) remove(place.id.toString()) else add(place.id.toString()) }
@@ -95,6 +95,8 @@ class MainActivity : ComponentActivity() {
                         title = { Text(place.name, fontWeight = FontWeight.Bold) },
                         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(place.category.uppercase(), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            FoodIllustration(place, 108)
+                            Text("Illustrative food icon · not a restaurant photo", fontSize = 10.sp, color = Color.Gray)
                             Text(place.description)
                             Text(place.address, color = Color.DarkGray)
                             Text("Ratings and photos are available in Google Maps (internet required)", color = Purple)
@@ -114,8 +116,8 @@ class MainActivity : ComponentActivity() {
         Text("LEEDS CONSERVATOIRE", color = Color(0xFFE7B4DB), fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
         Text("LCON BITES", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Black)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            LiaMascot(86)
-            Column { Text("Lia’s food quest", color = Color(0xFFFFE7A5), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            MelesMascot(86)
+            Column { Text("Meles’ food quest", color = Color(0xFFFFE7A5), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text("Your knight of nearby bites!", color = Color(0xFFF2E6F3), fontSize = 12.sp)
                 Text("Offline guide · 1.5 km radius", color = Color(0xFFD9C9E5), fontSize = 10.sp) }
         }
@@ -126,9 +128,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable private fun PlaceCard(place: Restaurant, saved: Boolean, onOpen: () -> Unit, onSave: () -> Unit) {
     Row(Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(16.dp)).clickable { onOpen() }.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(58.dp).background(Color(0xFFF0E5F4), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-            Text("✦", color = Purple, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-        }
+        FoodIllustration(place, 58)
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
             Text(place.name, color = Ink, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text("${place.category} · ${place.price}", color = Purple, fontSize = 11.sp)
@@ -138,7 +138,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable private fun LiaMascot(size: Int) {
+@Composable private fun MelesMascot(size: Int) {
     // Original lightweight vector mascot: entirely bundled inside the APK.
     // Inspired by fantasy knight aesthetics; no external copyrighted artwork.
     Box(Modifier.size(size.dp).background(Color(0xFFFFF0D7), CircleShape).border(2.dp, Color(0xFFE7C887), CircleShape), contentAlignment = Alignment.Center) {
@@ -169,5 +169,74 @@ class MainActivity : ComponentActivity() {
             // Apron brooch
             circle(Color(0xFFE6BD68),.5f,.83f,.05f)
         }
+    }
+}
+
+/**
+ * Offline food-category illustrations. A stable restaurant-specific seed chooses
+ * between related food symbols; it never misrepresents these as venue photographs.
+ */
+private fun foodArtwork(place: Restaurant): Pair<String, Color> {
+    val text = (place.category + " " + place.name).lowercase()
+    val variants: List<String>
+    val tint: Color
+    when {
+        listOf("burger", "hamburger", "five guys", "mcdonald", "wendy").any { it in text } -> {
+            variants = listOf("🍔", "🍟", "🍔"); tint = Color(0xFFFFE2B8)
+        }
+        listOf("pizza", "pizzeria").any { it in text } -> {
+            variants = listOf("🍕", "🍕", "🧀"); tint = Color(0xFFFFD8C7)
+        }
+        listOf("sushi", "japanese", "ramen", "noodle", "udon").any { it in text } -> {
+            variants = listOf("🍣", "🍜", "🍱"); tint = Color(0xFFE5E0FF)
+        }
+        listOf("chinese", "dim sum", "dumpling", "wok").any { it in text } -> {
+            variants = listOf("🥟", "🍜", "🥡"); tint = Color(0xFFFFE1CE)
+        }
+        listOf("indian", "curry", "biryani", "pakistani").any { it in text } -> {
+            variants = listOf("🍛", "🍚", "🥘"); tint = Color(0xFFFFE9B8)
+        }
+        listOf("thai", "vietnam", "pho").any { it in text } -> {
+            variants = listOf("🍜", "🥢", "🍲"); tint = Color(0xFFE2F1D8)
+        }
+        listOf("kebab", "shawarma", "turkish", "grill", "bbq", "steak").any { it in text } -> {
+            variants = listOf("🥙", "🍖", "🥩"); tint = Color(0xFFFFD9C8)
+        }
+        listOf("coffee", "cafe", "café", "espresso").any { it in text } -> {
+            variants = listOf("☕", "🥐", "🧁"); tint = Color(0xFFE9DCCB)
+        }
+        listOf("bakery", "pastry", "bread", "sandwich", "bagel").any { it in text } -> {
+            variants = listOf("🥐", "🥪", "🥯"); tint = Color(0xFFFFE8CC)
+        }
+        listOf("ice cream", "gelato", "dessert", "sweet", "cake", "donut").any { it in text } -> {
+            variants = listOf("🍦", "🍰", "🍩"); tint = Color(0xFFF7DDF1)
+        }
+        listOf("pub", "bar", "beer").any { it in text } -> {
+            variants = listOf("🍺", "🍟", "🥨"); tint = Color(0xFFFFE8B4)
+        }
+        listOf("vegan", "vegetarian", "salad", "healthy").any { it in text } -> {
+            variants = listOf("🥗", "🥑", "🥬"); tint = Color(0xFFDDF2D9)
+        }
+        listOf("chicken", "fried").any { it in text } -> {
+            variants = listOf("🍗", "🍟", "🍗"); tint = Color(0xFFFFE2BA)
+        }
+        listOf("fish", "seafood", "chips").any { it in text } -> {
+            variants = listOf("🐟", "🍤", "🍟"); tint = Color(0xFFD9EAF7)
+        }
+        else -> {
+            variants = listOf("🍽️", "🥘", "🍲", "🥪"); tint = Color(0xFFF0E5F4)
+        }
+    }
+    val index = (place.name.hashCode().toLong().and(0x7fffffffL) % variants.size).toInt()
+    return variants[index] to tint
+}
+
+@Composable private fun FoodIllustration(place: Restaurant, size: Int) {
+    val (symbol, tint) = remember(place.name, place.category) { foodArtwork(place) }
+    Box(
+        Modifier.size(size.dp).background(tint, RoundedCornerShape((size / 5).dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(symbol, fontSize = (size * .49f).sp, maxLines = 1)
     }
 }
