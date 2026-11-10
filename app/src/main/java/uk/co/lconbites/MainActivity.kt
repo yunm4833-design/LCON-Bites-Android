@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                     Column(Modifier.fillMaxSize().padding(padding)) {
                         Header()
                         if (tab == 0) {
-                            OfflineMap(onSelect = { selected = it }, favourites = favourites)
+                            OfflineMap(onSelect = { selected = it })
                             Text("NEAR LEEDS CONSERVATOIRE", modifier = Modifier.padding(start = 18.dp, top = 14.dp), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                             LazyColumn(contentPadding = PaddingValues(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 items(Places.all.take(5)) { place -> PlaceCard(place, favourites.contains(place.id.toString()), { selected = place }, {
@@ -109,34 +109,6 @@ class MainActivity : ComponentActivity() {
         Text("Good food. Close to campus.", color = Color(0xFFD8D1DC), fontSize = 13.sp)
         Spacer(Modifier.height(5.dp))
         Box(Modifier.width(58.dp).height(4.dp).background(Magenta, CircleShape))
-    }
-}
-
-@Composable private fun OfflineMap(onSelect: (Restaurant) -> Unit, favourites: Set<String>) {
-    Box(Modifier.fillMaxWidth().height(235.dp).padding(14.dp).background(Color(0xFFEAE5ED), RoundedCornerShape(20.dp))) {
-        Canvas(Modifier.fillMaxSize()) {
-            val w = size.width; val h = size.height
-            val road = Color(0xFFD2C9D9)
-            for (i in 1..5) {
-                drawLine(road, Offset(0f, h * i / 6f), Offset(w, h * i / 6f), 7f)
-                drawLine(road, Offset(w * i / 6f, 0f), Offset(w * i / 6f, h), 7f)
-            }
-            drawLine(Color(0xFFB9D8C4), Offset(0f, h * .82f), Offset(w, h * .62f), 18f)
-        }
-        Column(Modifier.align(Alignment.TopStart).padding(12.dp)) {
-            Text("LEEDS CITY CENTRE", color = Ink, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-            Text("Offline preview map", color = Color.DarkGray, fontSize = 10.sp)
-        }
-        Places.all.take(8).forEachIndexed { index, place ->
-            val x = .13f + (index % 4) * .23f
-            val y = .34f + (index / 4) * .34f
-            Box(Modifier.fillMaxWidth().fillMaxHeight().padding(start = 0.dp)) {
-                Box(Modifier.offset(x = (x * 290).dp, y = (y * 165).dp).size(28.dp).background(Purple, CircleShape).clickable { onSelect(place) }, contentAlignment = Alignment.Center) {
-                    Text("•", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
-                }
-            }
-        }
-        Text("Map data pack: planned", Modifier.align(Alignment.BottomEnd).padding(10.dp), color = Color.DarkGray, fontSize = 9.sp)
     }
 }
 
