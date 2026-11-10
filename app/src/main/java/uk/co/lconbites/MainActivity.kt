@@ -34,6 +34,7 @@ private val Paper = Color(0xFFF7F5F8)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Places.load(this)
         val prefs = getSharedPreferences("lcon_bites", MODE_PRIVATE)
         setContent {
             var tab by remember { mutableStateOf(0) }
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
             var category by remember { mutableStateOf("All") }
             var selected by remember { mutableStateOf<Restaurant?>(null) }
             var favourites by remember { mutableStateOf(prefs.getStringSet("favourites", emptySet())?.toSet() ?: emptySet()) }
-            val categories = listOf("All", "Cafe", "Brunch", "Indian", "Chinese", "Street food", "Food court", "British")
+            val categories = listOf("All") + Places.all.map { it.category }.distinct().sorted()
             val visible = Places.all.filter {
                 (tab != 2 || favourites.contains(it.id.toString())) &&
                 (category == "All" || it.category.equals(category, true)) &&
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         Header()
                         if (tab == 0) {
                             OfflineMap(onSelect = { selected = it })
-                            Text("NEAR LEEDS CONSERVATOIRE", modifier = Modifier.padding(start = 18.dp, top = 14.dp), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+                            Text("FOOD NEAR LEEDS CONSERVATOIRE", modifier = Modifier.padding(start = 18.dp, top = 14.dp), color = Purple, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
                             LazyColumn(contentPadding = PaddingValues(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 items(Places.all.take(5)) { place -> PlaceCard(place, favourites.contains(place.id.toString()), { selected = place }, {
                                     favourites = favourites.toMutableSet().apply { if (contains(place.id.toString())) remove(place.id.toString()) else add(place.id.toString()) }
