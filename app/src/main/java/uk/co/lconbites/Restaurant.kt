@@ -11,7 +11,8 @@ data class Restaurant(
     val description: String,
     val latitude: Double,
     val longitude: Double,
-    val price: String
+    val price: String,
+    val imageUrl: String = ""
 )
 
 object Places {
@@ -29,7 +30,7 @@ object Places {
                 p.optString("category", "Food").replace("_", " "),
                 p.optString("address", "Leeds city centre"),
                 "OpenStreetMap listing. Approx. ${p.optInt("distance_m")} m straight-line from Leeds Conservatoire; walking time not verified. Check current hours before visiting.",
-                p.getDouble("lat"), p.getDouble("lon"), "—"
+                p.getDouble("lat"), p.getDouble("lon"), "—", p.optString("image", "")
             )
         }
     }
