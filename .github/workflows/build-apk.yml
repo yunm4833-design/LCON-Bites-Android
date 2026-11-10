@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   build:
@@ -30,8 +31,30 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Bundle offline OSM road data
-        run: python3 scripts/fetch_osm.py
+      - name: Reuse validated offline map and restaurant snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p app/src/main/assets
+          # Use the last successful verified offline APK as the data source.
+          # No Overpass dependency during ordinary UI builds.
+          curl --fail --location --retry 3 \\
+            -H "Authorization: Bearer $GH_TOKEN" \\
+            -H "Accept: application/vnd.github+json" \\
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/13812174291/zip" \\
+            -o /tmp/lcon-previous.zip
+          unzip -oq /tmp/lcon-previous.zip -d /tmp/lcon-previous
+          unzip -p /tmp/lcon-previous/app-debug.apk assets/leeds_roads.json > app/src/main/assets/leeds_roads.json
+          unzip -p /tmp/lcon-previous/app-debug.apk assets/leeds_food.json > app/src/main/assets/leeds_food.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("app/src/main/assets")
+          roads = len(json.loads((root/"leeds_roads.json").read_text())["roads"])
+          food = len(json.loads((root/"leeds_food.json").read_text())["places"])
+          print(f"Validated offline snapshot: {roads} roads, {food} places")
+          assert roads >= 100 and food >= 35
+          PY
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
       - name: Upload APK
