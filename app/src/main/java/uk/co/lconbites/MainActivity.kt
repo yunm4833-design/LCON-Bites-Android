@@ -37,10 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Ink = Color(0xFF17131D)
-private val Purple = Color(0xFF51417C)
-private val Magenta = Color(0xFFB97C9F)
-private val Paper = Color(0xFFFFF9F1)
+private val Ink = Color(0xFF27213C)
+private val Purple = Color(0xFF59417F)
+private val Magenta = Color(0xFFBF799E)
+private val Paper = Color(0xFFFFF8F1)
+private val Gold = Color(0xFFD6A75E)
+private val DeepPurple = Color(0xFF302455)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,22 +68,24 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     containerColor = Paper,
                     bottomBar = {
-                        NavigationBar(containerColor = Color(0xFFFFF4E6)) {
+                        NavigationBar(containerColor = Color(0xFFFFFDF9), tonalElevation = 6.dp) {
                             NavigationBarItem(selected = tab == 0, onClick = { tab = 0 }, icon = { Icon(Icons.Default.LocationOn, null) }, label = { Text(tr("Map","地图")) })
                             NavigationBarItem(selected = tab == 1, onClick = { tab = 1 }, icon = { Icon(Icons.Default.Search, null) }, label = { Text(tr("Explore","探索")) })
                             NavigationBarItem(selected = tab == 2, onClick = { tab = 2 }, icon = { Icon(Icons.Default.Favorite, null) }, label = { Text(tr("Saved","收藏")) })
-                            NavigationBarItem(selected = tab == 3, onClick = { tab = 3; diceResult = Places.all.randomOrNull() }, icon = { Icon(Icons.Default.Casino, null) }, label = { Text(tr("Dice","骰子")) })
+                            NavigationBarItem(selected = tab == 3, onClick = { tab = 3; diceResult = Places.all.randomOrNull() }, icon = { Icon(Icons.Default.Casino, null) }, label = { Text(tr("Surprise","随缘吃")) })
                         }
                     }
                 ) { padding ->
                     Column(Modifier.fillMaxSize().padding(padding)) {
                         Header(chinese, onToggleLanguage = { chinese = !chinese; prefs.edit().putBoolean("chinese", chinese).apply() })
                         if (tab == 3) {
-                            Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                Text("🎲", fontSize = 64.sp)
+                            Column(Modifier.fillMaxSize().background(Paper).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                                MelesMascot(130)
+                                Text("✦  MELES’ LUCKY PICK  ✦", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Gold, letterSpacing = 2.sp)
+                                Text("🎲", fontSize = 56.sp)
                                 Text(tr("Meles picks your next bite!", "Meles 帮你决定今天吃什么！"), color = Purple, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                                 Text(tr("Random pick from nearby offline listings", "从附近离线餐厅目录中随机抽取"), color = Color.Gray)
-                                Button(onClick = { diceResult = Places.all.randomOrNull() }) { Text(tr("Roll again", "再掷一次")) }
+                                Button(onClick = { diceResult = Places.all.randomOrNull() }, shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Purple)) { Text(tr("✦ Roll again", "✦ 再掷一次")) }
                                 diceResult?.let { place ->
                                     FoodIllustration(place, 110)
                                     Text(place.name, fontSize = 21.sp, fontWeight = FontWeight.Bold)
@@ -99,9 +103,10 @@ class MainActivity : ComponentActivity() {
                                 }) }
                             }
                         } else {
-                            OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp), placeholder = { Text(tr("Search places, food or address","搜索餐厅、菜系或地址")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, singleLine = true, shape = RoundedCornerShape(16.dp))
-                            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                categories.take(4).forEach { c -> FilterChip(selected = category == c, onClick = { category = c }, label = { Text(c) }) }
+                            Text(tr("✦  Discover your next favourite", "✦  发现下一家心动美食"), modifier = Modifier.padding(start = 18.dp, top = 14.dp), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Purple)
+                            OutlinedTextField(value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp).background(Color.White, RoundedCornerShape(16.dp)), placeholder = { Text(tr("Search places, food or address","搜索餐厅、菜系或地址")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, singleLine = true, shape = RoundedCornerShape(16.dp))
+                            androidx.compose.foundation.lazy.LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                items(categories) { c -> FilterChip(selected = category == c, onClick = { category = c }, label = { Text(if (c == "All" && chinese) "全部" else c) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Color(0xFFECE1F7)), shape = RoundedCornerShape(50)) }
                             }
                             LazyColumn(contentPadding = PaddingValues(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 items(visible) { place -> PlaceCard(place, favourites.contains(place.id.toString()), { selected = place }, {
@@ -139,29 +144,32 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable private fun Header(chinese: Boolean, onToggleLanguage: () -> Unit) {
-    Column(Modifier.fillMaxWidth().background(Color(0xFF302455)).padding(horizontal = 20.dp, vertical = 18.dp)) {
+    Column(Modifier.fillMaxWidth().background(DeepPurple).padding(horizontal = 18.dp, vertical = 14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("LEEDS CONSERVATOIRE", color = Color(0xFFE7B4DB), fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             TextButton(onClick = onToggleLanguage) { Icon(Icons.Default.Language, null, tint = Color.White); Text(if (chinese) "EN" else "中文", color = Color.White) }
         }
-        Text("✦ LCON BITES", color = Color(0xFFFFF8E7), fontSize = 29.sp, fontWeight = FontWeight.Black)
+        Text(if (chinese) "✦ Meles的LC美食助手" else "✦ Meles’ LC Food Guide", color = Color(0xFFFFF8E7), fontSize = if (chinese) 23.sp else 25.sp, fontWeight = FontWeight.Black)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            MelesMascot(86)
-            Column { Text("♛ Meles’ Food Quest", color = Color(0xFFFFE7A5), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            MelesMascot(72)
+            Column { Text(if (chinese) "♛ 今天吃什么？交给 Meles！" else "♛ Meles’ Food Quest", color = Color(0xFFFFE7A5), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(if (chinese) "你的校园美食骑士！" else "Your knight of nearby bites!", color = Color(0xFFF2E6F3), fontSize = 12.sp)
                 Text(if (chinese) "离线美食指南 · 1.5 公里" else "Offline guide · 1.5 km radius", color = Color(0xFFD9C9E5), fontSize = 10.sp) }
         }
-        Spacer(Modifier.height(5.dp))
-        Box(Modifier.width(58.dp).height(4.dp).background(Magenta, CircleShape))
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("✦  OFFLINE MAP", fontSize = 9.sp, color = Color(0xFFFFE4AC), letterSpacing = 1.sp)
+            Text("✦  FOOD QUEST", fontSize = 9.sp, color = Color(0xFFFFE4AC), letterSpacing = 1.sp)
+        }
     }
 }
 
 @Composable private fun PlaceCard(place: Restaurant, saved: Boolean, onOpen: () -> Unit, onSave: () -> Unit) {
-    Row(Modifier.fillMaxWidth().background(Color(0xFFFFFDF8), RoundedCornerShape(16.dp)).border(1.dp, Color(0xFFE7C887), RoundedCornerShape(16.dp)).clickable { onOpen() }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().background(Color.White, RoundedCornerShape(20.dp)).border(1.dp, Color(0xFFF0E1CE), RoundedCornerShape(20.dp)).clickable { onOpen() }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
         FoodIllustration(place, 58)
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
             Text(place.name, color = Ink, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-            Text("${place.category} · ${place.price}", color = Purple, fontSize = 11.sp)
+            Text("✦ ${place.category}  ·  ${place.price}", color = Purple, fontSize = 11.sp)
             Text(place.address, color = Color.Gray, fontSize = 11.sp, maxLines = 1)
         }
         IconButton(onClick = onSave) { Icon(if (saved) Icons.Default.Favorite else Icons.Default.FavoriteBorder, null, tint = if (saved) Magenta else Color.Gray) }
